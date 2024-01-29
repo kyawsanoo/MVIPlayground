@@ -6,10 +6,13 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.ysfcyln.mviplayground.SecondActivity
 import com.ysfcyln.mviplayground.databinding.ActivityMainBinding
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,25 +42,37 @@ class MainActivity : AppCompatActivity() {
      * Initialize Observers
      */
     private fun initObservers() {
-        lifecycleScope.launchWhenStarted {
-            viewModel.uiState.collect {
-                when (it.randomNumberState) {
-                    is MainContract.RandomNumberState.Idle -> { binding.progressBar.isVisible = false }
-                    is MainContract.RandomNumberState.Loading -> { binding.progressBar.isVisible = true }
-                    is MainContract.RandomNumberState.Success -> {
-                        binding.progressBar.isVisible = false
-                        binding.number.text = it.randomNumberState.number.toString()
+        lifecycleScope.launch{
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+                viewModel.uiState.collect {
+                    when (it.randomNumberState) {
+                        is MainContract.RandomNumberState.Idle -> {
+                            binding.progressBar.isVisible = false
+                        }
+
+                        is MainContract.RandomNumberState.Loading -> {
+                            binding.progressBar.isVisible = true
+                        }
+
+                        is MainContract.RandomNumberState.Success -> {
+                            binding.progressBar.isVisible = false
+                            binding.number.text = it.randomNumberState.number.toString()
+                        }
                     }
                 }
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.effect.collect {
-                when (it) {
-                    is MainContract.Effect.ShowToast -> {
-                        binding.progressBar.isVisible = false
-                        showToast("Error, number is even")
+        lifecycleScope.launch{
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+                viewModel.effect.collect {
+                    when (it) {
+                        is MainContract.Effect.ShowToast -> {
+                            binding.progressBar.isVisible = false
+                            showToast("Error, number is even")
+                        }
                     }
                 }
             }
