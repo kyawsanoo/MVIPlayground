@@ -15,8 +15,8 @@ import com.ysfcyln.mviplayground.base.UiState
 class MainContract {
 
     sealed class Event : UiEvent {
-        object OnRandomNumberClicked : Event()
-        object OnShowToastClicked : Event()
+        data object OnRandomNumberClicked : Event()
+        data object OnShowToastClicked : Event()
     }
 
     data class State(
@@ -24,14 +24,14 @@ class MainContract {
     ) : UiState
 
     sealed class RandomNumberState {
-        object Idle : RandomNumberState()
-        object Loading : RandomNumberState()
+        data object Idle : RandomNumberState()
+        data object Loading : RandomNumberState()
         data class Success(val number : Int) : RandomNumberState()
     }
 
     sealed class Effect : UiEffect {
 
-        object ShowToast : Effect()
+        data object ShowToast : Effect()
 
     }
 
